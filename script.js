@@ -18,12 +18,16 @@ function main() {
   // lookup uniforms
   var resolutionLocation = gl.getUniformLocation(program, "u_resolution");
   var colorLocation = gl.getUniformLocation(program, "u_color");
+  var translationLocation = gl.getUniformLocation(program, "u_translation");
 
   // Create a buffer to put positions in
   var positionBuffer = gl.createBuffer();
 
   // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+  // Put geometry data into buffer
+  setGeometry(gl);
 
   var translation = [0, 0];
   var width = 100;
@@ -62,8 +66,6 @@ function main() {
     // Bind the position buffer.
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-    // Setup a rectangle
-    setRectangle(gl, translation[0], translation[1], width, height);
 
     // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
     var size = 2;          // 2 components per iteration
@@ -80,10 +82,13 @@ function main() {
     // set the color
     gl.uniform4fv(colorLocation, color);
 
-    // Draw the rectangle.
+    // Set the translation.
+    gl.uniform2fv(translationLocation, translation);
+
+    // Draw the geometry.
     var primitiveType = gl.TRIANGLES;
     var offset = 0;
-    var count = 6;
+    var count = 18;  // 6 triangles in the 'F', 3 points per triangle
     gl.drawArrays(primitiveType, offset, count);
   }
 }
@@ -106,5 +111,37 @@ function setRectangle(gl, x, y, width, height) {
       ]),
       gl.STATIC_DRAW);
 }
+
+// Fill the buffer with the values that define a letter 'F'.
+function setGeometry(gl) {
+    gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([
+            // left column
+            0, 0,
+            30, 0,
+            0, 150,
+            0, 150,
+            30, 0,
+            30, 150,
+  
+            // top rung
+            30, 0,
+            100, 0,
+            30, 30,
+            30, 30,
+            100, 0,
+            100, 30,
+  
+            // middle rung
+            30, 60,
+            67, 60,
+            30, 90,
+            30, 90,
+            67, 60,
+            67, 90,
+        ]),
+        gl.STATIC_DRAW);
+  }
 
 main();
